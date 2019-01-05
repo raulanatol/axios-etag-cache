@@ -48,9 +48,10 @@ function responseErrorInterceptor(error: AxiosError) {
   return Promise.reject(error);
 }
 
-export default function axiosETAGCache() {
-  axios.interceptors.request.use(requestInterceptor);
-  axios.interceptors.response.use(responseInterceptor, responseErrorInterceptor);
+export default function axiosETAGCache(config?: AxiosRequestConfig) {
+  const instance = axios.create(config);
+  instance.interceptors.request.use(requestInterceptor);
+  instance.interceptors.response.use(responseInterceptor, responseErrorInterceptor);
 
-  return axios;
+  return instance;
 }
