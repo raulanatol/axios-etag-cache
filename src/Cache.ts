@@ -24,6 +24,10 @@ export class Cache {
     return this.getInstance().cache.set(uuid, { etag, value });
   }
 
+  static reset() {
+    this.getInstance().cache.flushAll();
+  }
+
   constructor() {
     this.cache = new NodeCache();
   }
