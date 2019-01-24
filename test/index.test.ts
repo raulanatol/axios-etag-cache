@@ -1,4 +1,4 @@
-import axiosETAGCache from '../src';
+import axiosETAGCache, { resetCache } from '../src';
 import * as nock from 'nock';
 
 const USERS = [{ uuid: '123', name: 'John' }];
@@ -74,6 +74,19 @@ describe('Index', () => {
     axiosETAGCache().post('http://api.example.com/model').then(() => {
       expect(call1.isDone()).toBeTruthy();
       done();
+    }).catch(done);
+  });
+
+  test('should do second request without etag if cache was reset', done => {
+    const call1 = nock(BASE_PATH).get('/users').reply(200, USERS, { Etag: TEST_ETAG_0 });
+    const call2 = nock(BASE_PATH).get('/users').reply(200, replyIfNotEtagHeaders);
+    axiosETAGCache().get('http://api.example.com/users').then(() => {
+      resetCache();
+      axiosETAGCache().get('http://api.example.com/users').then(() => {
+        expect(call1.isDone()).toBeTruthy();
+        expect(call2.isDone()).toBeTruthy();
+        done();
+      }).catch(done);
     }).catch(done);
   });
 });
