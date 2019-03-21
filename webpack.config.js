@@ -16,7 +16,9 @@ module.exports = {
   },
   plugins: [
     new DtsBundlePlugin()
-  ]
+  ],
+  externals: ['axios', 'node-cache'],
+  devtool: false
 };
 
 function DtsBundlePlugin() {}
