@@ -35,7 +35,7 @@ function responseInterceptor(response: AxiosResponse) {
 }
 
 function responseErrorInterceptor(error: AxiosError) {
-  if (error.response.status === 304) {
+  if (error.response && error.response.status === 304) {
     const getCachedResult = getCacheByAxiosConfig(error.response.config);
     if (!getCachedResult) {
       return Promise.reject(error);
