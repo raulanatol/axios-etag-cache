@@ -13,6 +13,16 @@ function getCacheByAxiosConfig(config: AxiosRequestConfig) {
   return Cache.get(getUUIDByAxiosConfig(config));
 }
 
+function getHeaderCaseInsensitive(headerName, headers) {
+  let value = null;
+  Object.keys(headers).forEach((header) => {
+    if (header.toLowerCase() === headerName.toLowerCase()) {
+      value = headers[header];
+    }
+  });
+  return value;
+}
+
 function requestInterceptor(config: AxiosRequestConfig) {
   if (isCacheableMethod(config)) {
     const uuid = getUUIDByAxiosConfig(config);
@@ -26,7 +36,7 @@ function requestInterceptor(config: AxiosRequestConfig) {
 
 function responseInterceptor(response: AxiosResponse) {
   if (isCacheableMethod(response.config)) {
-    const responseETAG = response.headers.etag;
+    const responseETAG = getHeaderCaseInsensitive('etag', response.headers);
     if (responseETAG) {
       Cache.set(getUUIDByAxiosConfig(response.config), responseETAG, response.data);
     }
