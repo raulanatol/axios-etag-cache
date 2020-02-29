@@ -28,7 +28,7 @@
   "scripts": {
     "build": "npm run clean && webpack --mode production",
     "clean": "shx rm -rf dist .dts",
-    "lint": "tslint -p ./tsconfig.json",
+    "lint": "eslint --max-warnings 0 . --ext .ts,.tsx",
     "test": "jest"
   },
   "jest": {
@@ -53,8 +53,16 @@
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/jest": "^24.0.13",
+    "@typescript-eslint/eslint-plugin": "^2.21.0",
+    "@typescript-eslint/parser": "^2.21.0",
     "axios": "^0.19.0",
     "dts-bundle": "^0.7.3",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
     "jest": "^24.8.0",
     "nock": "^10.0.6",
     "node-cache": "^4.2.0",

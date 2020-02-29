@@ -1,5 +1,6 @@
 import { Cache } from './Cache';
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { getHeaderCaseInsensitive } from './utils';
 
 function isCacheableMethod(config: AxiosRequestConfig) {
   return ~['GET', 'HEAD'].indexOf(config.method.toUpperCase());
@@ -11,16 +12,6 @@ function getUUIDByAxiosConfig(config: AxiosRequestConfig) {
 
 function getCacheByAxiosConfig(config: AxiosRequestConfig) {
   return Cache.get(getUUIDByAxiosConfig(config));
-}
-
-function getHeaderCaseInsensitive(headerName, headers) {
-  let value = null;
-  Object.keys(headers).forEach((header) => {
-    if (header.toLowerCase() === headerName.toLowerCase()) {
-      value = headers[header];
-    }
-  });
-  return value;
 }
 
 function requestInterceptor(config: AxiosRequestConfig) {
