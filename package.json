@@ -1,6 +1,6 @@
 {
   "name": "axios-etag-cache",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "Axios etag interceptor to enable If-None-Match request with ETAG support",
   "main": "./dist/main.ts",
   "browser": "./dist/main.browser.js",
