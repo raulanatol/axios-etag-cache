@@ -3,6 +3,9 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { getHeaderCaseInsensitive } from './utils';
 
 function isCacheableMethod(config: AxiosRequestConfig) {
+  if (!config.method) {
+    return false;
+  }
   return ~['GET', 'HEAD'].indexOf(config.method.toUpperCase());
 }
 
@@ -11,12 +14,18 @@ function getUUIDByAxiosConfig(config: AxiosRequestConfig) {
 }
 
 function getCacheByAxiosConfig(config: AxiosRequestConfig) {
-  return Cache.get(getUUIDByAxiosConfig(config));
+  const url = getCacheByAxiosConfig(config);
+  if (url) {
+    return Cache.get(url);
+  }
 }
 
 function requestInterceptor(config: AxiosRequestConfig) {
   if (isCacheableMethod(config)) {
     const uuid = getUUIDByAxiosConfig(config);
+    if (!uuid) {
+      return undefined;
+    }
     const lastCachedResult = Cache.get(uuid);
     if (lastCachedResult) {
       config.headers = { ...config.headers, 'If-None-Match': lastCachedResult.etag };
@@ -29,7 +38,11 @@ function responseInterceptor(response: AxiosResponse) {
   if (isCacheableMethod(response.config)) {
     const responseETAG = getHeaderCaseInsensitive('etag', response.headers);
     if (responseETAG) {
-      Cache.set(getUUIDByAxiosConfig(response.config), responseETAG, response.data);
+      const uuid = getUUIDByAxiosConfig(response.config);
+      if (!uuid) {
+        return null;
+      }
+      Cache.set(uuid, responseETAG, response.data);
     }
   }
   return response;

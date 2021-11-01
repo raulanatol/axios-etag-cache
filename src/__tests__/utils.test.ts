@@ -1,4 +1,4 @@
-import { getHeaderCaseInsensitive } from '../src/utils';
+import { getHeaderCaseInsensitive } from '../utils';
 
 describe('utils', () => {
   describe('getHeaderCaseInsensitive', () => {

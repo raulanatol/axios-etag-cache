@@ -1,24 +1,38 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
-    "module": "commonjs",
     "target": "es6",
-    "allowSyntheticDefaultImports": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "forceConsistentCasingInFileNames": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
     "declaration": true,
-    "declarationDir": ".dts",
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "importHelpers": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
     "sourceMap": true,
-    "typeRoots": [
-      "node_modules/@types"
+    "outDir": "./dist/tsc/",
+    "types": [
+      "node",
+      "jest"
+    ],
+    "lib": [
+      "ES6",
+      "DOM"
     ]
   },
-  "files": [
-    "./src/index.ts"
+  "include": [
+    "src/**/*.ts"
   ],
   "exclude": [
-    "dist",
-    "build",
-    "node_modules"
+    "node_modules",
+    "**/*.test.ts"
   ]
 }

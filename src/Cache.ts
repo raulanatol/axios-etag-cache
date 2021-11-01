@@ -1,4 +1,22 @@
-import * as NodeCache from 'node-cache';
+export abstract class BaseCache {
+  private cache = {};
+
+  get(key: string): CacheValue | undefined {
+    return this.cache[key];
+  }
+
+  set(key: string, value: CacheValue) {
+    this.cache[key] = value;
+  }
+
+  flushAll() {
+    this.cache = {};
+  }
+}
+
+export class DefaultCache extends BaseCache {
+
+}
 
 export interface CacheValue {
   etag: string;
@@ -7,11 +25,11 @@ export interface CacheValue {
 
 export class Cache {
   static instance: Cache;
-  cache: NodeCache;
+  cache: BaseCache;
 
   static getInstance() {
     if (!this.instance) {
-      this.instance = new Cache();
+      this.instance = new Cache(new DefaultCache());
     }
     return this.instance;
   }
@@ -28,7 +46,7 @@ export class Cache {
     this.getInstance().cache.flushAll();
   }
 
-  constructor() {
-    this.cache = new NodeCache();
+  constructor(cache: BaseCache) {
+    this.cache = cache;
   }
 }

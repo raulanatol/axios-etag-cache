@@ -2,6 +2,10 @@
   "name": "axios-etag-cache",
   "version": "1.0.5",
   "description": "Axios etag interceptor to enable If-None-Match request with ETAG support",
+  "main": "./dist/main.ts",
+  "browser": "./dist/main.browser.js",
+  "types": "./dist/types/main.d.ts",
+  "bin": "./dist/cli.js",
   "keywords": [
     "axios",
     "cache",
@@ -20,16 +24,22 @@
     "name": "raulanatol",
     "email": "raul@natol.es"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "build": "npm run clean && webpack --mode production",
-    "clean": "shx rm -rf dist .dts",
-    "lint": "eslint --max-warnings 0 . --ext .ts,.tsx",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint --max-warnings 0 . --ext .ts",
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist build",
+    "ts-node": "ts-node",
+    "build-all": "npm run clean && npm run build && npm run esbuild-node && npm run esbuild-browser",
+    "esbuild-browser": "esbuild src/browser.ts --bundle --minify --sourcemap=external --outfile=dist/main.browser.js",
+    "esbuild-browser:dev": "esbuild src/browser.ts --bundle --outfile=dist/main.browser.js",
+    "esbuild-browser:watch": "esbuild src/browser.ts --bundle --watch --outfile=dist/main.browser.js",
+    "esbuild-node": "esbuild src/main.ts --bundle --platform=node --minify --sourcemap=external --outfile=dist/main.js",
+    "esbuild-node:dev": "esbuild src/main.ts --bundle --sourcemap=external --outfile=dist/main.js",
+    "esbuild-node:watch": "esbuild src/main.ts --bundle --watch --sourcemap=external --outfile=dist/main.js"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -38,6 +48,7 @@
       "js",
       "json"
     ],
+    "preset": "ts-jest",
     "moduleNameMapper": {
       "\\.(css|jpg|png|svg)$": "<rootDir>/node_modules/jest-css-modules"
     },
@@ -45,36 +56,35 @@
     "testPathIgnorePatterns": [
       "/node_modules/"
     ],
-    "testRegex": "(/test/.*|\\.(test|spec))\\.(ts|tsx|js)$",
-    "transform": {
-      "^.+\\.(ts|tsx)$": "<rootDir>/config/jest/preprocessor.js"
-    }
+    "testRegex": "(/test/.*|\\.(test|spec))\\.(ts|tsx|js)$"
   },
   "devDependencies": {
-    "@types/axios": "^0.14.0",
-    "@types/jest": "^24.0.13",
-    "@typescript-eslint/eslint-plugin": "^2.21.0",
-    "@typescript-eslint/parser": "^2.21.0",
-    "axios": "^0.21.1",
-    "dts-bundle": "^0.7.3",
-    "eslint": "^6.8.0",
-    "eslint-config-standard": "^14.1.0",
-    "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-node": "^11.0.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
-    "jest": "^24.8.0",
-    "nock": "^10.0.6",
-    "node-cache": "^4.2.0",
-    "shx": "^0.3.2",
-    "ts-loader": "^6.0.2",
-    "typescript": "^3.5.1",
-    "webpack": "^4.33.0",
-    "webpack-cli": "^3.3.3"
+    "@types/node": "16.11.6",
+    "esbuild": "0.13.12",
+    "eslint": "8.1.0",
+    "jest": "27.3.1",
+    "ts-jest": "27.0.7",
+    "ts-node": "10.4.0",
+    "typescript": "4.4.4",
+    "@cowcoders/eslint-config": "1.2.11",
+    "@types/axios": "0.14.0",
+    "@types/jest": "27.0.2",
+    "@typescript-eslint/eslint-plugin": "5.2.0",
+    "@typescript-eslint/parser": "5.2.0",
+    "axios": "0.24.0",
+    "eslint-config-standard": "16.0.3",
+    "eslint-plugin-import": "2.25.2",
+    "eslint-plugin-jsx-a11y": "6.4.1",
+    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-promise": "5.1.1",
+    "eslint-plugin-react-hooks": "4.2.0",
+    "eslint-plugin-standard": "5.0.0",
+    "nock": "13.1.4",
+    "shx": "0.3.3",
+    "ts-loader": "9.2.6"
   },
   "peerDependencies": {
-    "axios": "^0.21.1",
-    "node-cache": "^4.2.0"
+    "axios": ">=0.24.0"
   },
   "pre-push": [
     "lint",
