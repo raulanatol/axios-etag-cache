@@ -1,4 +1,4 @@
-import axiosETAGCache, { getCacheByAxiosConfig, resetCache } from '../index';
+import { axiosETAGCache, getCacheByAxiosConfig, resetCache } from '../index';
 import nock from 'nock';
 import { Cache } from '../Cache';
 
