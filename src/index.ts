@@ -13,12 +13,13 @@ function getUUIDByAxiosConfig(config: AxiosRequestConfig) {
   return config.url;
 }
 
-function getCacheByAxiosConfig(config: AxiosRequestConfig) {
-  const url = getCacheByAxiosConfig(config);
+export const getCacheByAxiosConfig = (config: AxiosRequestConfig) => {
+  const url = getUUIDByAxiosConfig(config);
   if (url) {
     return Cache.get(url);
   }
-}
+  return undefined;
+};
 
 function requestInterceptor(config: AxiosRequestConfig) {
   if (isCacheableMethod(config)) {
