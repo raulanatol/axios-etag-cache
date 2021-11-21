@@ -67,7 +67,7 @@ export function resetCache() {
   Cache.reset();
 }
 
-export default function axiosETAGCache(config?: AxiosRequestConfig) {
+export function axiosETAGCache(config?: AxiosRequestConfig) {
   const instance = axios.create(config);
   instance.interceptors.request.use(requestInterceptor);
   instance.interceptors.response.use(responseInterceptor, responseErrorInterceptor);
