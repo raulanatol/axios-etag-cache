@@ -1,5 +1,6 @@
-import axiosETAGCache, { resetCache } from '../index';
+import axiosETAGCache, { getCacheByAxiosConfig, resetCache } from '../index';
 import nock from 'nock';
+import { Cache } from '../Cache';
 
 const USERS = [{ uuid: '123', name: 'John' }];
 const TEST_ETAG_0 = '123ABC';
@@ -29,6 +30,24 @@ function replyIfNotEtagHeaders(request) {
 }
 
 describe('Index', () => {
+  describe('getCachedByAxiosConfig', () => {
+    it('should returns undefined when no config url is registered', () => {
+      const config = {};
+      Cache.get = jest.fn();
+
+      expect(getCacheByAxiosConfig(config)).toBeUndefined();
+      expect(Cache.get).not.toBeCalled();
+    });
+
+    it('should call to the cache.get method if url is registered', () => {
+      const config = { url: 'defined' };
+      Cache.get = jest.fn();
+
+      expect(getCacheByAxiosConfig(config)).toBeUndefined();
+      expect(Cache.get).toBeCalled();
+    });
+  });
+
   it('should do the second request with a If-none-match header', done => {
     const call1 = nock(BASE_PATH).get('/users').reply(200, USERS, { Etag: TEST_ETAG_0 });
     const call2 = nock(BASE_PATH).get('/users').reply(200, function () {

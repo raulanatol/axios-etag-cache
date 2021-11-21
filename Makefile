@@ -1,5 +1,9 @@
 .DEFAULT_GOAL := build
 
+init:
+	@echo "🏃‍♀️ Starting project..."
+	@yarn
+
 clean:
 	@echo "🛁 Cleaning..."
 	@yarn clean
