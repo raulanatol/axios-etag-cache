@@ -19,6 +19,7 @@ test:
 build: clean test
 	@echo "👩‍🏭 Building..."
 	@yarn build-all
+	@echo "✅"
 
 publish: build
 	@echo "📦 Publish package..."
