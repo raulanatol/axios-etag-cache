@@ -9,12 +9,12 @@ function isCacheableMethod(config: AxiosRequestConfig) {
   return ~['GET', 'HEAD'].indexOf(config.method.toUpperCase());
 }
 
-function getUUIDByAxiosConfig(config: AxiosRequestConfig) {
+function getUrlByAxiosConfig(config: AxiosRequestConfig) {
   return config.url;
 }
 
 export const getCacheByAxiosConfig = (config: AxiosRequestConfig) => {
-  const url = getUUIDByAxiosConfig(config);
+  const url = getUrlByAxiosConfig(config);
   if (url) {
     return Cache.get(url);
   }
@@ -23,11 +23,11 @@ export const getCacheByAxiosConfig = (config: AxiosRequestConfig) => {
 
 function requestInterceptor(config: AxiosRequestConfig) {
   if (isCacheableMethod(config)) {
-    const uuid = getUUIDByAxiosConfig(config);
-    if (!uuid) {
+    const url = getUrlByAxiosConfig(config);
+    if (!url) {
       return undefined;
     }
-    const lastCachedResult = Cache.get(uuid);
+    const lastCachedResult = Cache.get(url);
     if (lastCachedResult) {
       config.headers = { ...config.headers, 'If-None-Match': lastCachedResult.etag };
     }
@@ -39,11 +39,11 @@ function responseInterceptor(response: AxiosResponse) {
   if (isCacheableMethod(response.config)) {
     const responseETAG = getHeaderCaseInsensitive('etag', response.headers);
     if (responseETAG) {
-      const uuid = getUUIDByAxiosConfig(response.config);
-      if (!uuid) {
+      const url = getUrlByAxiosConfig(response.config);
+      if (!url) {
         return null;
       }
-      Cache.set(uuid, responseETAG, response.data);
+      Cache.set(url, responseETAG, response.data);
     }
   }
   return response;
@@ -74,4 +74,3 @@ export function axiosETAGCache(config?: AxiosRequestConfig) {
 
   return instance;
 }
-
