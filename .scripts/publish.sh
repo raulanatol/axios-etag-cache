@@ -66,3 +66,4 @@ assert_ready_to_publish $NEW_VERSION
 prepare_folder
 publish $NEW_VERSION
 git push --all
+git push --tags
