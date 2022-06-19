@@ -2,11 +2,12 @@
 
 init:
 	@echo "🏃‍♀️ Starting project..."
-	@yarn
+	@npm install
+	@cd demo && npm install
 
 clean:
 	@echo "🛁 Cleaning..."
-	@yarn clean
+	@npm run clean
 
 clean_all:
 	@echo "🧨 Clean all"
@@ -14,11 +15,18 @@ clean_all:
 
 test:
 	@echo "Testing..."
-	@yarn test
+	@npm run test
+
+.PHONY: demo
+demo:
+	@cd demo && npm run start
+
+demo-browser:
+	@cd demo && npm run start-browser
 
 build: clean test
 	@echo "👩‍🏭 Building..."
-	@yarn build-all
+	@npm run build
 	@echo "✅"
 
 publish: build

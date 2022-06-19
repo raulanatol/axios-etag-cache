@@ -4,12 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "start-browser": "webserver.local"
   },
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "0.24.0"
+    "axios": "0.24.0",
+    "axios-etag-cache": "1.2.1"
+  },
+  "devDependencies": {
+    "vite": "2.9.12"
   }
 }

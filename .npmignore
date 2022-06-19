@@ -10,3 +10,7 @@ tsconfig.json
 .eslintrc.json
 .nvmrc
 Makefile
+demo
+.github
+stats.html
+vite.config.js

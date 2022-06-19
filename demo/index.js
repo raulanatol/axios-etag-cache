@@ -1,7 +1,7 @@
-const { axiosETAGCache } = require('../dist/main.js');
-const axios = require('axios');
+import { axiosETAGCache } from 'axios-etag-cache';
+import axios from 'axios';
 
 axiosETAGCache(axios)
-  .get('http://example.com')
+  .get('https://example.com')
   .then(console.log)
   .catch(console.error);
