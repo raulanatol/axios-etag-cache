@@ -23,13 +23,6 @@ assert_ready_to_publish() {
   fi
 }
 
-prepare_folder() {
-  echo "Cleanup folders to publish"
-  find dist/tsc -type f -name '*.js' -print -delete
-  find dist/tsc -type f -name '*.js.map' -print -delete
-  mv dist/tsc dist/types
-}
-
 publish() {
   echo "Publish $1"
   npm version "$1"
@@ -63,7 +56,6 @@ if [ -z "$NEW_VERSION" ]; then
 fi
 
 assert_ready_to_publish $NEW_VERSION
-prepare_folder
 publish $NEW_VERSION
 git push --all
 git push --tags
