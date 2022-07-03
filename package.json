@@ -20,21 +20,14 @@
     "name": "raulanatol",
     "email": "raul@natol.es"
   },
-  "exports": {
-    ".": {
-      "import": "./dist/zzm-base.es.js",
-      "require": "./dist/zzm-base.umd.js"
-    }
-  },
-  "main": "./dist/zzm-base.umd.js",
-  "module": "./dist/zzm-base.es.js",
-  "types": "./dist/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/main.d.ts",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "analyze-build": "tsc && BUNDLE_ANALYZE=1 vite build",
-    "build": "tsc && vite build",
+    "build": "rollup -c",
     "clean": "rm -rf dist build",
     "lint": "eslint --max-warnings 0 . --ext .ts",
     "test": "jest"
@@ -58,25 +51,27 @@
   },
   "devDependencies": {
     "@cowcoders/eslint-config": "1.5.5",
+    "@rollup/plugin-babel": "5.3.1",
+    "@rollup/plugin-node-resolve": "13.3.0",
     "@types/axios": "0.14.0",
     "@types/jest": "28.1.2",
     "@types/node": "18.0.0",
     "@typescript-eslint/eslint-plugin": "5.28.0",
     "@typescript-eslint/parser": "5.28.0",
     "axios": "0.27.2",
-    "eslint": "^8.18.0",
+    "eslint": "8.18.0",
     "jest": "28.1.1",
     "nock": "13.2.7",
+    "rollup": "2.75.7",
     "rollup-plugin-auto-external": "2.0.0",
-    "rollup-plugin-visualizer": "^5.6.0",
+    "rollup-plugin-typescript2": "0.32.1",
+    "rollup-plugin-visualizer": "5.6.0",
     "shx": "0.3.4",
     "ts-jest": "28.0.5",
     "ts-loader": "9.3.0",
     "ts-node": "10.8.1",
     "typescript": "4.7.4",
-    "vite": "2.9.12",
-    "vite-plugin-dts": "1.2.0",
-    "webserver.local": "^1.0.5"
+    "webserver.local": "1.0.5"
   },
   "peerDependencies": {
     "axios": ">=0.24.0"

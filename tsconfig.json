@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "module": "commonjs",
+    "module": "es2015",
     "moduleResolution": "node",
     "declaration": true,
     "strict": true,
@@ -18,7 +18,8 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "sourceMap": true,
-    "outDir": "./dist/tsc/",
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist",
     "types": [
       "node",
       "jest"

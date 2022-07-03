@@ -1,6 +1,7 @@
 import { axiosETAGCache, getCacheByAxiosConfig, resetCache } from '../index';
 import nock from 'nock';
 import { Cache } from '../Cache';
+import axios from 'axios';
 
 const USERS = [{ uuid: '123', name: 'John' }];
 const TEST_ETAG_0 = '123ABC';
@@ -53,8 +54,8 @@ describe('Index', () => {
     const call2 = nock(BASE_PATH).get('/users').reply(200, function () {
       replyIfMatchEtag0(this.req);
     });
-    axiosETAGCache().get('http://api.example.com/users').then(() => {
-      axiosETAGCache().get('http://api.example.com/users').then(() => {
+    axiosETAGCache(axios).get('http://api.example.com/users').then(() => {
+      axiosETAGCache(axios).get('http://api.example.com/users').then(() => {
         expect(call1.isDone()).toBeTruthy();
         expect(call2.isDone()).toBeTruthy();
         done();
@@ -67,8 +68,8 @@ describe('Index', () => {
     const call2 = nock(BASE_PATH).get('/actions').reply(200, function () {
       replyIfNotEtagHeaders(this.req);
     });
-    axiosETAGCache().get('http://api.example.com/actions').then(() => {
-      axiosETAGCache().get('http://api.example.com/actions').then(() => {
+    axiosETAGCache(axios).get('http://api.example.com/actions').then(() => {
+      axiosETAGCache(axios).get('http://api.example.com/actions').then(() => {
         expect(call1.isDone()).toBeTruthy();
         expect(call2.isDone()).toBeTruthy();
         done();
@@ -80,9 +81,9 @@ describe('Index', () => {
     const call0 = nock(BASE_PATH).get('/actionsA').reply(200, USERS, { Etag: TEST_ETAG_0 });
     const call1 = nock(BASE_PATH).get('/actionsA').reply(200, USERS, { Etag: TEST_ETAG_1 });
     const call2 = nock(BASE_PATH).get('/actionsA').reply(200, replyIfMatchEtag1);
-    axiosETAGCache().get('http://api.example.com/actionsA').then(() => {
-      axiosETAGCache().get('http://api.example.com/actionsA').then(() => {
-        axiosETAGCache().get('http://api.example.com/actionsA').then(() => {
+    axiosETAGCache(axios).get('http://api.example.com/actionsA').then(() => {
+      axiosETAGCache(axios).get('http://api.example.com/actionsA').then(() => {
+        axiosETAGCache(axios).get('http://api.example.com/actionsA').then(() => {
           expect(call0.isDone()).toBeTruthy();
           expect(call1.isDone()).toBeTruthy();
           expect(call2.isDone()).toBeTruthy();
@@ -94,7 +95,7 @@ describe('Index', () => {
 
   it('not cacheable methods should works with normally - POST', done => {
     const call1 = nock(BASE_PATH).post('/model').reply(200, USERS);
-    axiosETAGCache().post('http://api.example.com/model').then(() => {
+    axiosETAGCache(axios).post('http://api.example.com/model').then(() => {
       expect(call1.isDone()).toBeTruthy();
       done();
     }).catch(done);
@@ -105,9 +106,9 @@ describe('Index', () => {
     const call2 = nock(BASE_PATH).get('/users').reply(200, function () {
       replyIfNotEtagHeaders(this.req);
     });
-    axiosETAGCache().get('http://api.example.com/users').then(() => {
+    axiosETAGCache(axios).get('http://api.example.com/users').then(() => {
       resetCache();
-      axiosETAGCache().get('http://api.example.com/users').then(() => {
+      axiosETAGCache(axios).get('http://api.example.com/users').then(() => {
         expect(call1.isDone()).toBeTruthy();
         expect(call2.isDone()).toBeTruthy();
         done();

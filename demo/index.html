@@ -5,10 +5,12 @@
   <title>axios etag cache</title>
 </head>
 <body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios-etag-cache@1.2.1/dist/main.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script type="module">
-  axiosETAGCache(axios)
+  import { axiosETAGCache } from '../dist/index.esm.js';
+
+  const axiosWithEtagCache = axiosETAGCache(axios);
+  axiosWithEtagCache
     .get('https://example.com')
     .then(console.log)
     .catch(console.error);

@@ -1,6 +1,6 @@
 import { Cache } from './Cache';
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { getHeaderCaseInsensitive } from './utils';
+import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 function isCacheableMethod(config: AxiosRequestConfig) {
   if (!config.method) {
@@ -67,10 +67,9 @@ export function resetCache() {
   Cache.reset();
 }
 
-export function axiosETAGCache(config?: AxiosRequestConfig) {
-  const instance = axios.create(config);
-  instance.interceptors.request.use(requestInterceptor);
-  instance.interceptors.response.use(responseInterceptor, responseErrorInterceptor);
+export function axiosETAGCache(axiosInstance: AxiosInstance): AxiosInstance {
+  axiosInstance.interceptors.request.use(requestInterceptor);
+  axiosInstance.interceptors.response.use(responseInterceptor, responseErrorInterceptor);
 
-  return instance;
+  return axiosInstance;
 }

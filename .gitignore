@@ -2,3 +2,4 @@ node_modules
 dist
 .dts/
 stats.html
+devs.sh

@@ -1,7 +1,3 @@
-'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
 class BaseCache {
     constructor() {
         this.cache = {};
@@ -111,10 +107,5 @@ function axiosETAGCache(axiosInstance) {
     return axiosInstance;
 }
 
-exports.BaseCache = BaseCache;
-exports.Cache = Cache;
-exports.DefaultCache = DefaultCache;
-exports.axiosETAGCache = axiosETAGCache;
-exports.getCacheByAxiosConfig = getCacheByAxiosConfig;
-exports.resetCache = resetCache;
-//# sourceMappingURL=index.js.map
+export { BaseCache, Cache, DefaultCache, axiosETAGCache, getCacheByAxiosConfig, resetCache };
+//# sourceMappingURL=index.esm.js.map

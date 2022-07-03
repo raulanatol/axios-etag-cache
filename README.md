@@ -8,7 +8,10 @@ Axios etag interceptor to enable If-None-Match request with ETAG support
 const axios = require('axios');
 const { axiosETAGCache } = require('axios-etag-cache');
 
-axiosETAGCache(axios)
+// Apply the axios ETAG interceptor
+const axiosWithETAGCache = axiosETAGCache(axios);
+
+axiosWithETAGCache
   .get('http://example.com')
   .then(console.log)
   .catch(console.error);
