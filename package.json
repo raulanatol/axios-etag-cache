@@ -71,7 +71,7 @@
     "ts-loader": "9.3.0",
     "ts-node": "10.8.1",
     "typescript": "4.7.4",
-    "webserver.local": "1.0.5"
+    "webserver.local": "1.0.6"
   },
   "peerDependencies": {
     "axios": ">=0.24.0"
