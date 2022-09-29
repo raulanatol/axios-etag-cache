@@ -16,6 +16,6 @@
     "axios-etag-cache": "1.2.1"
   },
   "devDependencies": {
-    "vite": "2.9.12"
+    "vite": "2.9.13"
   }
 }
