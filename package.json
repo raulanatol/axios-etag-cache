@@ -30,7 +30,8 @@
     "build": "rollup -c",
     "clean": "rm -rf dist build",
     "lint": "eslint --max-warnings 0 . --ext .ts",
-    "test": "jest"
+    "test": "jest",
+    "prepare": "npm run build"
   },
   "jest": {
     "moduleFileExtensions": [

@@ -1,12 +1,15 @@
-import { Cache } from './Cache';
-import { getHeaderCaseInsensitive } from './utils';
+import {axiosETAGCacheOptions, cyrb53, getHeaderCaseInsensitive} from './utils';
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { DefaultCache, getCacheInstance } from './Cache';
+
+let Cache;
+let cacheableMethods = ['GET', 'HEAD'];
 
 function isCacheableMethod(config: AxiosRequestConfig) {
   if (!config.method) {
     return false;
   }
-  return ~['GET', 'HEAD'].indexOf(config.method.toUpperCase());
+  return ~cacheableMethods.indexOf(config.method.toUpperCase());
 }
 
 function getUrlByAxiosConfig(config: AxiosRequestConfig) {
@@ -16,7 +19,12 @@ function getUrlByAxiosConfig(config: AxiosRequestConfig) {
 export const getCacheByAxiosConfig = (config: AxiosRequestConfig) => {
   const url = getUrlByAxiosConfig(config);
   if (url) {
-    return Cache.get(url);
+    if (config.data) {
+      const hash = cyrb53(config.data);
+      return Cache.get(hash + url);
+    } else {
+      return Cache.get(url);
+    }
   }
   return undefined;
 };
@@ -27,7 +35,18 @@ function requestInterceptor(config: AxiosRequestConfig) {
     if (!url) {
       return undefined;
     }
-    const lastCachedResult = Cache.get(url);
+    let lastCachedResult;
+    if (config.data) {
+      try {
+        const hash = cyrb53(JSON.stringify(config.data));
+        lastCachedResult = Cache.get(hash + url);
+      } catch (e) {
+        console.error(e);
+      }
+    } else {
+      lastCachedResult = Cache.get(url);
+    }
+
     if (lastCachedResult) {
       config.headers = { ...config.headers, 'If-None-Match': lastCachedResult.etag };
     }
@@ -43,7 +62,17 @@ function responseInterceptor(response: AxiosResponse) {
       if (!url) {
         return null;
       }
-      Cache.set(url, responseETAG, response.data);
+      if (response.config.data) {
+        try {
+          const hash = cyrb53(response.config.data);
+          Cache.set(hash + url, responseETAG, response.data);
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        Cache.set(url, responseETAG, response.data);
+      }
+
     }
   }
   return response;
@@ -67,7 +96,17 @@ export function resetCache() {
   Cache.reset();
 }
 
-export function axiosETAGCache(axiosInstance: AxiosInstance): AxiosInstance {
+export function axiosETAGCache(axiosInstance: AxiosInstance, options?: axiosETAGCacheOptions): AxiosInstance {
+  if (options?.cacheClass) {
+    Cache = getCacheInstance(options.cacheClass);
+  } else {
+    Cache = getCacheInstance(DefaultCache);
+  }
+
+  if (options?.enablePost === true) {
+    cacheableMethods.push('POST');
+  }
+
   axiosInstance.interceptors.request.use(requestInterceptor);
   axiosInstance.interceptors.response.use(responseInterceptor, responseErrorInterceptor);
 
