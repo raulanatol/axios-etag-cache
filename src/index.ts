@@ -20,7 +20,7 @@ export const getCacheByAxiosConfig = (config: AxiosRequestConfig) => {
   const url = getUrlByAxiosConfig(config);
   if (url) {
     if (config.data) {
-      const hash = cyrb53(JSON.stringify(config.data));
+      const hash = cyrb53(config.data);
       return Cache.get(hash + url);
     } else {
       return Cache.get(url);
