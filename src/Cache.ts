@@ -29,7 +29,7 @@ export class DefaultCache extends BaseCache {
 
 }
 
-export class LocalStorageClass extends BaseCache {
+export class LocalStorageCache extends BaseCache {
   flushAll() {
     for (let i = 0; i < localStorage.length; i++){
       const key = localStorage.key(i);
