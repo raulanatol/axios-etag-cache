@@ -1,3 +1,10 @@
+import { ConstructableCache } from './Cache';
+
+
+export interface axiosETAGCacheOptions {
+  cacheClass: ConstructableCache<any>
+}
+
 const byLowerCase = toFind => value => toLowerCase(value) === toFind;
 const toLowerCase = value => value.toLowerCase();
 const getKeys = headers => Object.keys(headers);

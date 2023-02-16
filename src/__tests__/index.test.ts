@@ -1,7 +1,10 @@
 import { axiosETAGCache, getCacheByAxiosConfig, resetCache } from '../index';
 import nock from 'nock';
-import { Cache } from '../Cache';
 import axios from 'axios';
+import { DefaultCache, getCacheInstance } from '../Cache';
+
+const Cache = getCacheInstance(DefaultCache);
+
 
 const USERS = [{ uuid: '123', name: 'John' }];
 const TEST_ETAG_0 = '123ABC';
@@ -32,6 +35,7 @@ function replyIfNotEtagHeaders(request) {
 
 describe('Index', () => {
   describe('getCachedByAxiosConfig', () => {
+    axiosETAGCache(axios);
     it('should returns undefined when no config url is registered', () => {
       const config = {};
       Cache.get = jest.fn();

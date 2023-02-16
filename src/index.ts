@@ -1,12 +1,16 @@
-import { Cache } from './Cache';
-import { getHeaderCaseInsensitive } from './utils';
+
+import { axiosETAGCacheOptions, getHeaderCaseInsensitive } from './utils';
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import {DefaultCache, getCacheInstance} from './Cache';
+
+let Cache;
+let cacheableMethods = ['GET', 'HEAD'];
 
 function isCacheableMethod(config: AxiosRequestConfig) {
   if (!config.method) {
     return false;
   }
-  return ~['GET', 'HEAD'].indexOf(config.method.toUpperCase());
+  return ~cacheableMethods.indexOf(config.method.toUpperCase());
 }
 
 function getUrlByAxiosConfig(config: AxiosRequestConfig) {
@@ -67,7 +71,13 @@ export function resetCache() {
   Cache.reset();
 }
 
-export function axiosETAGCache(axiosInstance: AxiosInstance): AxiosInstance {
+export function axiosETAGCache(axiosInstance: AxiosInstance, options?: axiosETAGCacheOptions): AxiosInstance {
+  if (options?.cacheClass) {
+    Cache = getCacheInstance(options.cacheClass);
+  } else {
+    Cache = getCacheInstance(DefaultCache);
+  }
+
   axiosInstance.interceptors.request.use(requestInterceptor);
   axiosInstance.interceptors.response.use(responseInterceptor, responseErrorInterceptor);
 
