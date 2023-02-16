@@ -20,7 +20,7 @@ export const getCacheByAxiosConfig = (config: AxiosRequestConfig) => {
   const url = getUrlByAxiosConfig(config);
   if (url) {
     if (config.data) {
-      const hash = cyrb53(config.data);
+      const hash = cyrb53(JSON.stringify(config.data));
       return Cache.get(hash + url);
     } else {
       return Cache.get(url);
@@ -38,7 +38,7 @@ function requestInterceptor(config: AxiosRequestConfig) {
     let lastCachedResult;
     if (config.data) {
       try {
-        const hash = cyrb53(config.data);
+        const hash = cyrb53(JSON.stringify(config.data));
         lastCachedResult = Cache.get(hash + url);
       } catch (e) {
         console.error(e);
