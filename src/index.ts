@@ -1,7 +1,7 @@
-
 import { axiosETAGCacheOptions, getHeaderCaseInsensitive } from './utils';
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import {DefaultCache, getCacheInstance} from './Cache';
+import { DefaultCache, getCacheInstance } from './Cache';
+import { createHash } from 'crypto';
 
 let Cache;
 let cacheableMethods = ['GET', 'HEAD'];
@@ -31,7 +31,18 @@ function requestInterceptor(config: AxiosRequestConfig) {
     if (!url) {
       return undefined;
     }
-    const lastCachedResult = Cache.get(url);
+    let lastCachedResult;
+    if (config.data) {
+      try {
+        const hash = createHash('sha256').update(JSON.stringify(config.data)).digest('hex');
+        lastCachedResult = Cache.get(hash + url);
+      } catch (e) {
+        console.error(e);
+      }
+    } else {
+      lastCachedResult = Cache.get(url);
+    }
+
     if (lastCachedResult) {
       config.headers = { ...config.headers, 'If-None-Match': lastCachedResult.etag };
     }
@@ -47,7 +58,17 @@ function responseInterceptor(response: AxiosResponse) {
       if (!url) {
         return null;
       }
-      Cache.set(url, responseETAG, response.data);
+      if (response.config.data) {
+        try {
+          const hash = createHash('sha256').update(response.config.data).digest('hex');
+          Cache.set(hash + url, responseETAG, response.data);
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        Cache.set(url, responseETAG, response.data);
+      }
+
     }
   }
   return response;
@@ -76,6 +97,10 @@ export function axiosETAGCache(axiosInstance: AxiosInstance, options?: axiosETAG
     Cache = getCacheInstance(options.cacheClass);
   } else {
     Cache = getCacheInstance(DefaultCache);
+  }
+
+  if (options?.enablePost === true) {
+    cacheableMethods.push('POST');
   }
 
   axiosInstance.interceptors.request.use(requestInterceptor);
