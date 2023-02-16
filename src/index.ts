@@ -1,7 +1,6 @@
-import { axiosETAGCacheOptions, getHeaderCaseInsensitive } from './utils';
+import {axiosETAGCacheOptions, cyrb53, getHeaderCaseInsensitive} from './utils';
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { DefaultCache, getCacheInstance } from './Cache';
-import { createHash } from 'crypto';
 
 let Cache;
 let cacheableMethods = ['GET', 'HEAD'];
@@ -20,7 +19,12 @@ function getUrlByAxiosConfig(config: AxiosRequestConfig) {
 export const getCacheByAxiosConfig = (config: AxiosRequestConfig) => {
   const url = getUrlByAxiosConfig(config);
   if (url) {
-    return Cache.get(url);
+    if (config.data) {
+      const hash = cyrb53(config.data);
+      return Cache.get(hash + url);
+    } else {
+      return Cache.get(url);
+    }
   }
   return undefined;
 };
@@ -34,7 +38,7 @@ function requestInterceptor(config: AxiosRequestConfig) {
     let lastCachedResult;
     if (config.data) {
       try {
-        const hash = createHash('sha256').update(JSON.stringify(config.data)).digest('hex');
+        const hash = cyrb53(config.data);
         lastCachedResult = Cache.get(hash + url);
       } catch (e) {
         console.error(e);
@@ -60,7 +64,7 @@ function responseInterceptor(response: AxiosResponse) {
       }
       if (response.config.data) {
         try {
-          const hash = createHash('sha256').update(response.config.data).digest('hex');
+          const hash = cyrb53(response.config.data);
           Cache.set(hash + url, responseETAG, response.data);
         } catch (e) {
           console.error(e);
