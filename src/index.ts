@@ -29,7 +29,7 @@ export const getCacheByAxiosConfig = (config: AxiosRequestConfig) => {
   return undefined;
 };
 
-function requestInterceptor(config: AxiosRequestConfig) {
+async function requestInterceptor(config: AxiosRequestConfig) {
   if (isCacheableMethod(config)) {
     const url = getUrlByAxiosConfig(config);
     if (!url) {
@@ -44,7 +44,7 @@ function requestInterceptor(config: AxiosRequestConfig) {
         console.error(e);
       }
     } else {
-      lastCachedResult = Cache.get(url);
+      lastCachedResult = await Cache.get(url);
     }
 
     if (lastCachedResult) {

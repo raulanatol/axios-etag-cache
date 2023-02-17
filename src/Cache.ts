@@ -5,6 +5,8 @@ export interface ConstructableCache<T> {
 export abstract class BaseCache {
   abstract get(key: string): CacheValue | undefined
 
+  abstract getSync(key: string): Promise<CacheValue | undefined>
+
   abstract set(key: string, value: CacheValue)
 
   abstract flushAll()
@@ -16,6 +18,10 @@ export class DefaultCache extends BaseCache {
 
   get(key: string): CacheValue | undefined {
     return this.cache[key];
+  }
+
+  getSync(key: string): Promise<CacheValue | undefined> {
+    return Promise.resolve(this.cache[key]);
   }
 
   set(key: string, value: CacheValue) {
@@ -52,6 +58,10 @@ export class LocalStorageCache extends BaseCache {
     }
   }
 
+  getSync(key: string): Promise<CacheValue | undefined> {
+    return Promise.resolve(this.get(key));
+  }
+
   set(key: string, value: CacheValue) {
     try {
       const payload = JSON.stringify(value);
@@ -82,13 +92,13 @@ let cache: BaseCache;
  *
  * Note: Object.freeze() not required due to type narrowing!
  */
-const makeSingleton = (cacheClass: ConstructableCache<BaseCache>) => {
+const makeSingleton = async (cacheClass: ConstructableCache<BaseCache>) => {
   /** Closure of the singleton's value to keep it private */
   cache = new cacheClass();
   /** Only the accessors are returned */
   return {
-    get(uuid: string): CacheValue | undefined {
-      return cache.get(uuid);
+    async get(uuid: string): Promise<CacheValue | undefined> {
+      return await cache.getSync(uuid);
     },
     set(uuid: string, etag: string, value: any) {
       return cache.set(uuid, { etag, value });
