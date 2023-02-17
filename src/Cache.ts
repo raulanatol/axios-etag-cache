@@ -84,7 +84,7 @@ let cache: BaseCache;
  *
  * Note: Object.freeze() not required due to type narrowing!
  */
-const makeSingleton = async (cacheClass: ConstructableCache<BaseCache>) => {
+const makeSingleton = (cacheClass: ConstructableCache<BaseCache>) => {
   /** Closure of the singleton's value to keep it private */
   cache = new cacheClass();
   /** Only the accessors are returned */
