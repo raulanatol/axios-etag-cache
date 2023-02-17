@@ -68,32 +68,28 @@ export class LocalStorageCache extends BaseCache {
 export interface CacheValue {
   etag: string;
   value: any;
+  createdAt: number
+  lastHitAt: number
 }
 
-/**
- * The only instance of our Singleton
- */
 let instance: ReturnType<typeof makeSingleton>;
-
 let cache: BaseCache;
 
-/**
- * Singleton supplies accessors using Revealing Module
- * pattern and we use generics, since we could reuse
- * this across multiple singletons
- *
- * Note: Object.freeze() not required due to type narrowing!
- */
 const makeSingleton = (cacheClass: ConstructableCache<BaseCache>) => {
   /** Closure of the singleton's value to keep it private */
   cache = new cacheClass();
   /** Only the accessors are returned */
   return {
     async get(uuid: string): Promise<CacheValue | undefined> {
-      return await cache.get(uuid);
+      let payload: CacheValue | undefined = await cache.get(uuid);
+      if (payload) {
+        payload = { ...payload, lastHitAt: Date.now() };
+        cache.set(uuid, payload);
+      }
+      return payload;
     },
     set(uuid: string, etag: string, value: any) {
-      return cache.set(uuid, { etag, value });
+      return cache.set(uuid, { etag, value, createdAt: Date.now(), lastHitAt: 0 });
     },
     reset() {
       cache.flushAll();
@@ -101,11 +97,6 @@ const makeSingleton = (cacheClass: ConstructableCache<BaseCache>) => {
   };
 };
 
-/**
- * Retrieves the only instance of the Singleton
- * and allows a once-only initialisation
- * (additional changes require the setValue accessor)
- */
 export const getCacheInstance = (cacheClass: ConstructableCache<BaseCache>) => {
   if (!instance) {
     instance = makeSingleton(cacheClass);
