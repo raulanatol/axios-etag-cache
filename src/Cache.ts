@@ -3,9 +3,7 @@ export interface ConstructableCache<T> {
 }
 
 export abstract class BaseCache {
-  abstract get(key: string): CacheValue | undefined
-
-  abstract getSync(key: string): Promise<CacheValue | undefined>
+  abstract get(key: string): Promise<CacheValue | undefined>
 
   abstract set(key: string, value: CacheValue)
 
@@ -16,11 +14,7 @@ export abstract class BaseCache {
 export class DefaultCache extends BaseCache {
   private cache = {};
 
-  get(key: string): CacheValue | undefined {
-    return this.cache[key];
-  }
-
-  getSync(key: string): Promise<CacheValue | undefined> {
+  get(key: string): Promise<CacheValue | undefined> {
     return Promise.resolve(this.cache[key]);
   }
 
@@ -45,21 +39,19 @@ export class LocalStorageCache extends BaseCache {
     }
   }
 
-  get(key: string): CacheValue | undefined {
-    try {
-      const payload: string | null = localStorage.getItem('aec-' + key);
-      if (payload !== null) {
-        return JSON.parse(payload);
-      } else {
-        return undefined;
+  get(key: string): Promise<CacheValue | undefined> {
+    return new Promise((resolve) => {
+      try {
+        const payload: string | null = localStorage.getItem('aec-' + key);
+        if (payload !== null) {
+          resolve(JSON.parse(payload));
+        } else {
+          resolve(undefined);
+        }
+      } catch (e) {
+        resolve(undefined);
       }
-    } catch (e) {
-      return undefined;
-    }
-  }
-
-  getSync(key: string): Promise<CacheValue | undefined> {
-    return Promise.resolve(this.get(key));
+    });
   }
 
   set(key: string, value: CacheValue) {
@@ -98,7 +90,7 @@ const makeSingleton = async (cacheClass: ConstructableCache<BaseCache>) => {
   /** Only the accessors are returned */
   return {
     async get(uuid: string): Promise<CacheValue | undefined> {
-      return await cache.getSync(uuid);
+      return await cache.get(uuid);
     },
     set(uuid: string, etag: string, value: any) {
       return cache.set(uuid, { etag, value });
