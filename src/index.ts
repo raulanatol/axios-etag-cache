@@ -39,7 +39,7 @@ async function requestInterceptor(config: AxiosRequestConfig): Promise<AxiosRequ
     if (config.data) {
       try {
         const hash = cyrb53(JSON.stringify(config.data));
-        lastCachedResult = Cache.get(hash + url);
+        lastCachedResult = await Cache.get(hash + url);
       } catch (e) {
         console.error(e);
       }
