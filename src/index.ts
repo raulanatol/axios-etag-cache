@@ -16,84 +16,94 @@ function getUrlByAxiosConfig(config: AxiosRequestConfig) {
   return config.url;
 }
 
-export const getCacheByAxiosConfig = (config: AxiosRequestConfig) => {
+export const getCacheByAxiosConfig = async (config: AxiosRequestConfig) => {
   const url = getUrlByAxiosConfig(config);
   if (url) {
     if (config.data) {
       const hash = cyrb53(config.data);
-      return Cache.get(hash + url);
+      return await Cache.get(hash + url);
     } else {
-      return Cache.get(url);
+      return await Cache.get(url);
     }
   }
   return undefined;
 };
 
-function requestInterceptor(config: AxiosRequestConfig) {
-  if (isCacheableMethod(config)) {
-    const url = getUrlByAxiosConfig(config);
-    if (!url) {
-      return undefined;
-    }
-    let lastCachedResult;
-    if (config.data) {
-      try {
-        const hash = cyrb53(JSON.stringify(config.data));
-        lastCachedResult = Cache.get(hash + url);
-      } catch (e) {
-        console.error(e);
-      }
-    } else {
-      lastCachedResult = Cache.get(url);
-    }
-
-    if (lastCachedResult) {
-      config.headers = { ...config.headers, 'If-None-Match': lastCachedResult.etag };
-    }
-  }
-  return config;
-}
-
-function responseInterceptor(response: AxiosResponse) {
-  if (isCacheableMethod(response.config)) {
-    const responseETAG = getHeaderCaseInsensitive('etag', response.headers);
-    if (responseETAG) {
-      const url = getUrlByAxiosConfig(response.config);
+function requestInterceptor(config: AxiosRequestConfig): Promise<AxiosRequestConfig> {
+  return new Promise<AxiosRequestConfig>(async (resolve, reject) => {
+    if (isCacheableMethod(config)) {
+      const url = getUrlByAxiosConfig(config);
       if (!url) {
-        return null;
+        reject(config);
+        return;
       }
-      if (response.config.data) {
+      let lastCachedResult;
+      if (config.data) {
         try {
-          const hash = cyrb53(response.config.data);
-          Cache.set(hash + url, responseETAG, response.data);
+          const hash = cyrb53(JSON.stringify(config.data));
+          lastCachedResult = await Cache.get(hash + url);
         } catch (e) {
           console.error(e);
         }
       } else {
-        Cache.set(url, responseETAG, response.data);
+        lastCachedResult = await Cache.get(url);
       }
 
+      if (lastCachedResult) {
+        config.headers = { ...config.headers, 'If-None-Match': lastCachedResult.etag };
+      }
     }
-  }
-  return response;
+    resolve(config);
+  });
 }
 
-function responseErrorInterceptor(error: AxiosError) {
-  if (error.response && error.response.status === 304) {
-    const getCachedResult = getCacheByAxiosConfig(error.response.config);
-    if (!getCachedResult) {
-      return Promise.reject(error);
+function responseInterceptor(response: AxiosResponse): Promise<AxiosResponse> {
+  return new Promise<AxiosResponse>((resolve, reject) => {
+    if (isCacheableMethod(response.config)) {
+      const responseETAG = getHeaderCaseInsensitive('etag', response.headers);
+      if (responseETAG) {
+        const url = getUrlByAxiosConfig(response.config);
+        if (!url) {
+          reject(null);
+          return;
+        }
+        if (response.config.data) {
+          try {
+            const hash = cyrb53(response.config.data);
+            Cache.set(hash + url, responseETAG, response.data);
+          } catch (e) {
+            console.error(e);
+          }
+        } else {
+          Cache.set(url, responseETAG, response.data);
+        }
+
+      }
     }
-    const newResponse = error.response;
-    newResponse.status = 200;
-    newResponse.data = getCachedResult.value;
-    return Promise.resolve(newResponse);
-  }
-  return Promise.reject(error);
+    resolve(response);
+  });
 }
 
-export function resetCache() {
-  Cache.reset();
+function responseErrorInterceptor(error: AxiosError): Promise<AxiosError|AxiosResponse> {
+  return new Promise(async (resolve, reject) => {
+    if (error.response && error.response.status === 304) {
+      const getCachedResult = await getCacheByAxiosConfig(error.response.config);
+      if (!getCachedResult) {
+        reject(error);
+        return;
+      }
+      const newResponse: AxiosResponse = error.response;
+      newResponse.status = 200;
+      newResponse.data = getCachedResult.value;
+      resolve(newResponse);
+      return;
+    }
+    reject(error);
+  });
+}
+
+export async function resetCache() {
+  await Cache.reset();
 }
 
 export function axiosETAGCache(axiosInstance: AxiosInstance, options?: axiosETAGCacheOptions): AxiosInstance {

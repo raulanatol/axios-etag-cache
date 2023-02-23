@@ -34,7 +34,7 @@ function replyIfNotEtagHeaders(request) {
 }
 
 describe('Index', () => {
-  describe('getCachedByAxiosConfig', () => {
+  describe('getCachedByAxiosConfig', async () => {
     axiosETAGCache(axios);
     it('should returns undefined when no config url is registered', () => {
       const config = {};
