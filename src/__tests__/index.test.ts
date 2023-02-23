@@ -34,21 +34,25 @@ function replyIfNotEtagHeaders(request) {
 }
 
 describe('Index', () => {
-  describe('getCachedByAxiosConfig', async () => {
+  describe('getCachedByAxiosConfig', () => {
     axiosETAGCache(axios);
-    it('should returns undefined when no config url is registered', () => {
+    it('should returns undefined when no config url is registered', async () => {
       const config = {};
       Cache.get = jest.fn();
 
-      expect(getCacheByAxiosConfig(config)).toBeUndefined();
+      const result = await getCacheByAxiosConfig(config);
+
+      expect(result).toBeUndefined();
       expect(Cache.get).not.toBeCalled();
     });
 
-    it('should call to the cache.get method if url is registered', () => {
+    it('should call to the cache.get method if url is registered', async () => {
       const config = { url: 'defined' };
       Cache.get = jest.fn();
 
-      expect(getCacheByAxiosConfig(config)).toBeUndefined();
+      const result = await getCacheByAxiosConfig(config);
+
+      expect(result).toBeUndefined();
       expect(Cache.get).toBeCalled();
     });
   });
